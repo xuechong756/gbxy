@@ -6877,7 +6877,31 @@ window.__require = function e(t, i, n) {
                 cc.dm.initHallData(),
                 this.initLevelMap(),
                 this.initPrizeBtn(),
-                this.shopRedDotNode.active = !cc.dm.shopRedDot
+                this.shopRedDotNode.active = !cc.dm.shopRedDot;
+			
+				var shopBtn = cc.find("menu/shopBtn", this.node);
+					
+				var recomNode = new cc.Node();
+                recomNode.y = shopBtn.y + shopBtn.height;
+				recomNode.x = shopBtn.x;
+				recomNode.parent = shopBtn.parent;
+				
+				recomNode.color = new cc.Color(233,16,16, 255);
+                
+				var lable = recomNode.addComponent(cc.Label);
+                lable.string = "更多好玩";
+                lable.fontSize = 40;
+                lable.lineHeight = 40;
+				var action = cc.sequence(cc.scaleTo(.5, 1.2), cc.scaleTo(.5, 0.9));
+				action = cc.repeatForever(action);
+                recomNode.runAction(action);
+                recomNode.on(cc.Node.EventType.TOUCH_START, function(){
+                    //埋点 推荐更多好玩
+                   // console.log("more game");
+					window.h5api && window.h5api.showRecommend();
+                }, this);		
+				
+				console.log(this.node);
             },
             start: function() {},
             skillBtnCallBack: function() {
@@ -6891,7 +6915,7 @@ window.__require = function e(t, i, n) {
                     e.skillLayer = n
                 }))
             },
-            shopBtnCallBack: function() {
+            shopBtnCallBack: function(event) {
                 var e = this;
                 console.log("shopBtnCallback"),
                 this.shopLayer ? this.shopLayer.active = !0 : (cc.gm.showLoading(),
