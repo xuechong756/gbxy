@@ -5282,12 +5282,20 @@ window.__require = function e(t, i, n) {
 				var lose = cc.find("lose", this.node);
 				var doubleWin = cc.find("win/double", this.node);
 				//埋点 激励用完隐藏 不用定时
-				//lose.children[4].active = 0;
-				//doubleWin.active = 0;
-				
+				window.h5api && window.h5api.canPlayAd(function(data){
+					if(lose.children[4].active){
+						lose.children[4].active = data.canPlayAd;
+					}
+					if(doubleWin.active){
+						doubleWin.active = data.canPlayAd;
+					}
+				});				
 				
 				//埋点 上报分数
-				console.log("score:" + cc.dm.wantToLevel);
+			//	console.log("score:" + cc.dm.wantToLevel);
+				if (window.h5api && window.h5api.isLogin()) {
+                    window.h5api.submitRanking(cc.dm.wantToLevel, function (data) { });
+                }
 			},
             setWinLab: function() {
                 var e = cc.dm.userBase
@@ -6924,7 +6932,14 @@ window.__require = function e(t, i, n) {
 					cc.gm.showMsg("\u6392\u884c\u699c3\u7ea7\u4ee5\u540e\u5f00\u653e")
 				}else{
 					//埋点 显示排行榜
-					console.log("show ranking");
+					//console.log("show ranking");
+					if(window.h5api){
+						if (window.h5api.isLogin()) {
+						 window.h5api.showRanking();
+						} else if (confirm("登录后才能看到好友哦~")) {
+							window.h5api.login(function (obj) { });
+						}
+					}
 				}
 				
 				console.log("show ranking");
@@ -8162,10 +8177,13 @@ window.__require = function e(t, i, n) {
 				thisObj.btns = [];
 				//埋点 激励用完执行
 				this.TimeCheckAd = setInterval(function(){
-					var canPlay = true;
-					for(var index = 0; index < thisObj.btns.length; index++){
-						thisObj.btns[index].active = canPlay;
-					}
+					window.h5api && window.h5api.canPlayAd(function(data){
+						//
+						var canPlay = data.canPlayAd;
+						for(var index = 0; index < thisObj.btns.length; index++){
+							thisObj.btns[index].active = canPlay;
+						}
+					});
 				}, 500);
 			},
 			onDestroy:function(){
@@ -8860,10 +8878,11 @@ window.__require = function e(t, i, n) {
                 this.initTaskLayer()
             },
             start: function() {
-				
 				var doubleBtn = this.loginNode.getChildByName("doubleBtn");
 				//埋点 激励用完隐藏。不用定时
-				//doubleBtn.active = 0;
+				window.h5api && window.h5api.canPlayAd(function(data){
+					doubleBtn.active = data.canPlayAd;
+				});
 			},
             closeBtnCallBack: function() {
                 this.node.active = !1
@@ -9198,8 +9217,9 @@ window.__require = function e(t, i, n) {
                 key: "share",
                 value: function(e) {
 					//埋点 分享 root share
-					console.log("show root share");
+					//console.log("show root share");
 					
+					window.h5api && window.h5api.share();
                   /*  console.log("\u5fae\u4fe1\u5206\u4eab");
                     var t = Math.floor(5 * Math.random());
                     wx.shareAppMessage({
@@ -9237,8 +9257,19 @@ window.__require = function e(t, i, n) {
                 key: "showView",
                 value: function(e, t) {
 					//埋点 root video。 完整播放完回调t();否则不回调
-					console.log("show video");
-					t();
+					//console.log("show video");
+					if(window.h5api){
+						window.h5api.playAd(function(obj){
+							console.log('代码:' + obj.code + ',消息:' + obj.message);
+							if (obj.code === 10000) {
+								console.log('开始播放');
+							} else if (obj.code === 10001) {
+								t();
+							} else {
+								//console.log('广告异常');
+							}
+						});
+					}
 					
 					//修改
                   /*  var i = this
