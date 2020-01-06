@@ -5278,7 +5278,17 @@ window.__require = function e(t, i, n) {
                     this.reGameMoneyBtnNode.getComponent(cc.Button).interactable = cc.dm.userBase.money >= 50
                 }
             },
-            start: function() {},
+            start: function() {
+				var lose = cc.find("lose", this.node);
+				var doubleWin = cc.find("win/double", this.node);
+				//埋点 激励用完隐藏 不用定时
+				//lose.children[4].active = 0;
+				//doubleWin.active = 0;
+				
+				
+				//埋点 上报分数
+				console.log("score:" + cc.dm.wantToLevel);
+			},
             setWinLab: function() {
                 var e = cc.dm.userBase
                   , t = e.wantExp;
@@ -6898,7 +6908,8 @@ window.__require = function e(t, i, n) {
                 }))
             },
             rankingListBtnCallBack: function() {
-                var e = this;
+				//修改 
+              /*  var e = this;
                 console.log("rankingListBtnCallBack"),
                 cc.dm.userBase.userLevel < 3 ? cc.gm.showMsg("\u6392\u884c\u699c3\u7ea7\u4ee5\u540e\u5f00\u653e") : this.rankingListLayer ? this.rankingListLayer.active = !0 : (cc.gm.showLoading(),
                 cc.loader.loadRes("hall/prefabs/rankingList", function(t, i) {
@@ -6906,7 +6917,18 @@ window.__require = function e(t, i, n) {
                     var n = cc.instantiate(i);
                     e.node.addChild(n),
                     e.rankingListLayer = n
-                }))
+                }))*/
+				
+				var e = this;
+				if(cc.dm.userBase.userLevel < 3){
+					cc.gm.showMsg("\u6392\u884c\u699c3\u7ea7\u4ee5\u540e\u5f00\u653e")
+				}else{
+					//埋点 显示排行榜
+					console.log("show ranking");
+				}
+				
+				console.log("show ranking");
+
             },
             settingBtnCallBack: function() {
                 var e = this;
@@ -6970,7 +6992,7 @@ window.__require = function e(t, i, n) {
             },
             prizeBtnCallBack: function() {
                 var e = this;
-                cc.nm.showView("adunit-fdfc7c2bac1e6b17", function() {
+                cc.nm.showView("", function() {
                     var t = Date.now() + 6e5;
                     if (cc.dm.setItem("prizeTime", t),
                     cc.dm.addPrizeInHall(),
@@ -7436,7 +7458,6 @@ window.__require = function e(t, i, n) {
                 cc.nm.initShare(),
                 cc.dm.initJsonCfg(t),
                 cc.gm.initMusic(),
-                cc.nm.showView(),
                 cc.game.setFrameRate(30),
                 this.preloadOk = !1,
                 cc.director.preloadScene("gameScene", function() {
@@ -7720,7 +7741,8 @@ window.__require = function e(t, i, n) {
             }, {
                 key: "share",
                 value: function(e) {
-                    cc.sys.platform === cc.sys.WECHAT_GAME ? o.share(e) : setTimeout(e, 2e3)
+                   // cc.sys.platform === cc.sys.WECHAT_GAME ? o.share(e) : setTimeout(e, 2e3)
+				   o.share(e);
                 }
             }, {
                 key: "vibrateShort",
@@ -7730,8 +7752,11 @@ window.__require = function e(t, i, n) {
             }, {
                 key: "showView",
                 value: function(e, t) {
-                    cc.sys.platform === cc.sys.WECHAT_GAME ? o.showView(e, t) : e ? (console.log("\u89c2\u770b\u89c6\u9891 \u5e7f\u544a\u4f4d\u540d\u79f0 = ", e),
-                    t()) : console.log("\u521d\u59cb\u5316\u6fc0\u52b1\u89c6\u9891\u7ec4\u4ef6")
+					o.showView(e, t);
+					
+					//修改
+                   /* cc.sys.platform === cc.sys.WECHAT_GAME ? o.showView(e, t) : e ? (console.log("\u89c2\u770b\u89c6\u9891 \u5e7f\u544a\u4f4d\u540d\u79f0 = ", e),
+                    t()) : console.log("\u521d\u59cb\u5316\u6fc0\u52b1\u89c6\u9891\u7ec4\u4ef6")*/
                 }
             }]),
             e
@@ -8129,13 +8154,28 @@ window.__require = function e(t, i, n) {
                 useSP: {
                     default: [],
                     type: [cc.SpriteFrame]
-                }
+                },
+				btns:[]
             },
-            onLoad: function() {},
+            onLoad: function() {
+				var thisObj = this;
+				thisObj.btns = [];
+				//埋点 激励用完执行
+				this.TimeCheckAd = setInterval(function(){
+					var canPlay = true;
+					for(var index = 0; index < thisObj.btns.length; index++){
+						thisObj.btns[index].active = canPlay;
+					}
+				}, 500);
+			},
+			onDestroy:function(){
+				clearInterval(this.TimeCheckAd);
+			},
             onEnable: function() {
                 this.initShopLayer()
             },
             initShopLayer: function() {
+				var btns = [];
                 for (var e in console.log("initShopLayer"),
                 this.layout.removeAllChildren(),
                 cc.dm.userShop) {
@@ -8148,12 +8188,16 @@ window.__require = function e(t, i, n) {
                         i.getChildByName("times").getComponent(cc.Label).string = this._getTotalString(t),
                         i.getChildByName("itemImg").getComponent(cc.Sprite).spriteFrame = this.itemSP[n[t.shop_type]];
                         var s = i.getChildByName("buyBtn");
+						if(2 == t.shop_costtype){
+							btns.push(s);
+						}
                         s.getChildByName("buyNum").getComponent(cc.Label).string = t.shop_cost,
                         s.getChildByName("buyImg").getComponent(cc.Sprite).spriteFrame = this.useSP[t.shop_costtype],
                         s.on("click", this.buyBtnCallBack.bind(this)),
                         this.layout.addChild(i)
                     }
                 }
+				this.btns = btns;
             },
             _getTotalString: function(e) {
                 return void 0 !== e.shop_limit_total && null !== e.shop_limit_total ? "\u603b\u5171\u5269\u4f59" + e.shop_limit_total + "\u6b21" : "\u4eca\u65e5\u5269\u4f59" + e.shop_limit + "\u6b21"
@@ -8806,13 +8850,21 @@ window.__require = function e(t, i, n) {
                     type: cc.Node
                 }
             },
-            onLoad: function() {},
+            onLoad: function() {
+				
+				
+			},
             onEnable: function() {
                 this.refreshBtn(!0),
                 this.initLoginLayer(),
                 this.initTaskLayer()
             },
-            start: function() {},
+            start: function() {
+				
+				var doubleBtn = this.loginNode.getChildByName("doubleBtn");
+				//埋点 激励用完隐藏。不用定时
+				//doubleBtn.active = 0;
+			},
             closeBtnCallBack: function() {
                 this.node.active = !1
             },
@@ -8850,8 +8902,10 @@ window.__require = function e(t, i, n) {
                         var c = r.getChildByName("num");
                         c && (c.getComponent(cc.Label).string = "x" + a.sign_rewardnum)
                     }
-                this.loginItem.hasGetOver && (this.loginNode.getChildByName("getBtn").getComponent(cc.Button).interactable = !1,
-                this.loginNode.getChildByName("doubleBtn").getComponent(cc.Button).interactable = !1)
+				try{
+					this.loginItem.hasGetOver && (this.loginNode.getChildByName("getBtn").getComponent(cc.Button).interactable = !1,
+					this.loginNode.getChildByName("doubleBtn").getComponent(cc.Button).interactable = !1)
+				}catch(err){}
             },
             getLoginPrizeBtnCallBack: function(e, t) {
                 var i = this;
@@ -9143,7 +9197,10 @@ window.__require = function e(t, i, n) {
             }, {
                 key: "share",
                 value: function(e) {
-                    console.log("\u5fae\u4fe1\u5206\u4eab");
+					//埋点 分享 root share
+					console.log("show root share");
+					
+                  /*  console.log("\u5fae\u4fe1\u5206\u4eab");
                     var t = Math.floor(5 * Math.random());
                     wx.shareAppMessage({
                         title: a[t],
@@ -9161,7 +9218,7 @@ window.__require = function e(t, i, n) {
                     }),
                     setTimeout(function() {
                         cc.gm.emit(o.finishTask, 4)
-                    }, 1e3)
+                    }, 1e3)*/
                 }
             }, {
                 key: "vibrateShort",
@@ -9179,7 +9236,12 @@ window.__require = function e(t, i, n) {
             }, {
                 key: "showView",
                 value: function(e, t) {
-                    var i = this
+					//埋点 root video。 完整播放完回调t();否则不回调
+					console.log("show video");
+					t();
+					
+					//修改
+                  /*  var i = this
                       , n = wx.createRewardedVideoAd({
                         adUnitId: "adunit-fdfc7c2bac1e6b17"
                     });
@@ -9192,7 +9254,7 @@ window.__require = function e(t, i, n) {
                         });
                         n.onClose(function e(i) {
                             console.log("\u89c6\u9891\u64ad\u653e\u5b8c\u6bd5"),
-                            i && i.isEnded || void 0 === i ? t() : cc.gm.showMsg("\u672a\u80fd\u89c2\u770b\u5b8c\u6574\u89c6\u9891"),
+                            i && i.isEnded || void 0 === i ? t() : cc.gm.showMsg("未能观看完整视频"),
                             n.offClose(e)
                         })
                     } else
@@ -9202,7 +9264,7 @@ window.__require = function e(t, i, n) {
                             setTimeout(function() {
                                 cc.dm.videoCallBack && cc.dm.videoCallBack()
                             }, 2e3))
-                        })
+                        })*/
                 }
             }]),
             e
