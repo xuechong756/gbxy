@@ -9282,7 +9282,7 @@ window.__require = function e(t, i, n) {
                 value: function(e, t) {
 					//埋点 root video。 完整播放完回调t();否则不回调
 					//console.log("show video");
-					if(window.h5api){
+					if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
 						window.h5api.playAd(function(obj){
 							console.log('代码:' + obj.code + ',消息:' + obj.message);
 							if (obj.code === 10000) {
