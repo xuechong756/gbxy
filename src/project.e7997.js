@@ -5801,7 +5801,12 @@ window.__require = function e(t, i, n) {
                 return (i = i < 0 ? 0 : i) + ":" + ((n = n < 0 ? 0 : n) < 10 ? "0" + n : n)
             },
             initTime: function() {
-				 cc.dm.gameCfg.gameRule.time = 9999;
+				//修改 测试
+				 /*cc.dm.gameCfg.gameRule.time = 9999;
+				 setInterval(function(){
+					cc.dm.gameRole.HP = 3;
+				 }.bind(this), 1000);8*/
+				 
                 var e = this
                   , t = this.timeNode.getComponent(cc.Sprite)
                   , i = this.timeNode.parent.getChildByName("timeLab").getComponent(cc.Label);
@@ -8457,7 +8462,7 @@ window.__require = function e(t, i, n) {
                     r.getChildByName("useNum").getComponent(cc.Label).string = "",
                     r.getChildByName("info").getComponent(cc.Label).string = "\u5df2\u6ee1\u7ea7"),
                     a.on("click", this.levelUpBtnCallBack.bind(this)),
-                    o.on("click", this.studyBtnCallBack.bind(this)),
+                    o.on("click", this.studyBtnCallBack, this),
                     this.layout.addChild(n)
                 }
             },
@@ -8466,13 +8471,13 @@ window.__require = function e(t, i, n) {
             },
             studyBtnCallBack: function(e) {
                 console.log("studyBtncallBack", e),
-                cc.dm.updateskillInHall(e.target.parent.skill),
+                cc.dm.updateskillInHall(e.node.parent.skill),
                 this.initSkill(),
                 cc.gm.emit(n.updateUserInfoInHall, {})
             },
             levelUpBtnCallBack: function(e) {
                 console.log("levelUpBtnCallBack", e),
-                cc.dm.updateskillInHall(e.target.parent.skill),
+                cc.dm.updateskillInHall(e.node.parent.skill),
                 this.initSkill(),
                 cc.gm.emit(n.updateUserInfoInHall, {})
             }
