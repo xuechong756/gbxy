@@ -6901,6 +6901,14 @@ window.__require = function e(t, i, n) {
 					window.h5api && window.h5api.showRecommend();
                 }, this);		
 				
+				var thisObj = this;
+				this.TimeCheckAd = setInterval(function(){
+					window.h5api && window.h5api.canPlayAd(function(data){
+						thisObj.prizeBtnNode.active = data.canPlayAd;
+					}.bind(this));
+				}, 500);
+				
+				//prizeBtn
 				console.log(this.node);
             },
             start: function() {},
@@ -7027,9 +7035,11 @@ window.__require = function e(t, i, n) {
             },
             onDestroy: function() {
                 this.timeOut && (clearInterval(this.timeOut),
-                this.timeOut = null)
+                this.timeOut = null);
+				clearInterval(this.TimeCheckAd);
             },
-            prizeBtnCallBack: function() {
+            prizeBtnCallBack: function(event) {
+				console.log(event.target);
                 var e = this;
                 cc.nm.showView("", function() {
                     var t = Date.now() + 6e5;
