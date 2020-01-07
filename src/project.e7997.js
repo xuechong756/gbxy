@@ -6973,18 +6973,112 @@ window.__require = function e(t, i, n) {
 				}else{
 					//埋点 显示排行榜
 					//console.log("show ranking");
-					if(window.h5api){
-						if (window.h5api.isLogin()) {
+					if (window.h5api && window.h5api.isLogin()) {
 						 window.h5api.showRanking();
-						} else if (confirm("登录后才能看到好友哦~")) {
-							window.h5api.login(function (obj) { });
-						}
+					} else{
+						this.dialogConfirm("登录后才能看到好友哦~", function(){
+							window.h5api && window.h5api.login(function (obj) { });
+						}, function(){});
 					}
 				}
 				
 				console.log("show ranking");
 
             },
+			dialogConfirm(infor, enterFun, cancelFun, viewNode){
+				var markNode = new cc.Node();
+				var graphics = markNode.addComponent(cc.Graphics);
+				let _canvas = cc.Canvas.instance;
+				let _rateR = _canvas.designResolution.height/_canvas.designResolution.width;
+				var winWidth = cc.Canvas.instance.node.height/_rateR;
+				var winHeight = cc.Canvas.instance.node.height;
+				markNode.width = winWidth;
+				markNode.height = winHeight;
+				graphics.rect(-winWidth/2, -winHeight/2,winWidth, winHeight);
+				graphics.fillColor = new cc.Color(0, 0, 0, 125);
+				graphics.fill();
+				var dialogNode = new cc.Node();
+				var dialoagGrap = dialogNode.addComponent(cc.Graphics);
+				var x = winWidth/3;
+				
+				var dialongWinWith = winWidth - x;
+				var dialongWinHeight = dialongWinWith * 0.618;
+				var y = - (dialongWinHeight/2);
+				dialoagGrap.rect(-x, y , dialongWinWith, dialongWinHeight);
+				dialoagGrap.fillColor = new cc.Color(255, 255, 255, 255);
+				dialoagGrap.fill();
+				
+				//title
+				var titleNode = new cc.Node();
+				titleNode.color = new cc.Color(0, 0, 0, 255);
+				var titleLabel = titleNode.addComponent(cc.Label);
+				titleLabel.fontSize = 40;
+				titleLabel.lineHeight = titleLabel.fontSize;
+				titleNode.y = dialongWinHeight/2 - titleLabel.lineHeight;
+				titleLabel.string = "提示";
+				dialogNode.addChild(titleNode);
+				
+				//infor
+				var inforNode = new cc.Node();
+				inforNode.color = new cc.Color(0, 0, 0, 255);
+				var inforLabel = inforNode.addComponent(cc.Label);
+				inforLabel.fontSize = 30;
+				inforLabel.lineHeight = inforLabel.fontSize;
+				inforNode.y += inforLabel.lineHeight;
+				inforLabel.string = infor;
+				dialogNode.addChild(inforNode);
+				
+				//button left
+				var btnLeftNode = new cc.Node();
+				btnLeftNode.color = new cc.Color(0, 0, 0, 255);
+				
+				var btnLeft = btnLeftNode.addComponent(cc.Label);
+				btnLeft.string = "取消";
+				btnLeft.fontSize = 28;
+				btnLeft.lineHeight = btnLeft.fontSize;
+				btnLeftNode.x = -dialongWinWith/4 ;
+				btnLeftNode.y = -dialongWinHeight/4 ;
+				dialogNode.addChild(btnLeftNode);
+				
+				function cancelCallback(e){
+					console.log("cancel");
+					markNode.destroy();
+					if(cancelFun){
+						cancelFun();
+					}
+				}
+				btnLeftNode.on(cc.Node.EventType.TOUCH_END, cancelCallback, this);
+				
+				//button right 
+				var btnRightNode = new cc.Node();
+				btnRightNode.color = new cc.Color(0, 0, 0, 255);
+				var btnRight = btnRightNode.addComponent(cc.Label);
+				btnRight.string = "确定";
+				btnRight.fontSize = btnLeft.fontSize;
+				btnRight.lineHeight = btnRight.fontSize;
+				btnRightNode.x = dialongWinWith/4 ;
+				btnRightNode.y = -dialongWinHeight/4;
+				dialogNode.addChild(btnRightNode);
+				function enterCallback(e){
+					console.log("enter");
+					markNode.destroy();
+					if(enterFun){
+						enterFun();
+					}
+				}
+				btnRightNode.on(cc.Node.EventType.TOUCH_END, enterCallback, this);
+				
+				
+				markNode.addComponent(cc.BlockInputEvents);
+				markNode.addChild(dialogNode);
+				
+				if(viewNode){
+					viewNode.addChild(markNode);
+				}else{
+					var can = cc.director.getScene().getChildByName("Canvas");
+					can.addChild(markNode);
+				}
+			},
             settingBtnCallBack: function() {
                 var e = this;
                 console.log("settingBtnCallBack"),
@@ -9181,6 +9275,100 @@ window.__require = function e(t, i, n) {
             if (!(e instanceof t))
                 throw new TypeError("Cannot call a class as a function")
         }
+		function dialogConfirm(infor, enterFun, cancelFun, viewNode){
+				var markNode = new cc.Node();
+				var graphics = markNode.addComponent(cc.Graphics);
+				let _canvas = cc.Canvas.instance;
+				let _rateR = _canvas.designResolution.height/_canvas.designResolution.width;
+				var winWidth = cc.Canvas.instance.node.height/_rateR;
+				var winHeight = cc.Canvas.instance.node.height;
+				markNode.width = winWidth;
+				markNode.height = winHeight;
+				graphics.rect(-winWidth/2, -winHeight/2,winWidth, winHeight);
+				graphics.fillColor = new cc.Color(0, 0, 0, 125);
+				graphics.fill();
+				var dialogNode = new cc.Node();
+				var dialoagGrap = dialogNode.addComponent(cc.Graphics);
+				var x = winWidth/3;
+				
+				var dialongWinWith = winWidth - x;
+				var dialongWinHeight = dialongWinWith * 0.618;
+				var y = - (dialongWinHeight/2);
+				dialoagGrap.rect(-x, y , dialongWinWith, dialongWinHeight);
+				dialoagGrap.fillColor = new cc.Color(255, 255, 255, 255);
+				dialoagGrap.fill();
+				
+				//title
+				var titleNode = new cc.Node();
+				titleNode.color = new cc.Color(0, 0, 0, 255);
+				var titleLabel = titleNode.addComponent(cc.Label);
+				titleLabel.fontSize = 40;
+				titleLabel.lineHeight = titleLabel.fontSize;
+				titleNode.y = dialongWinHeight/2 - titleLabel.lineHeight;
+				titleLabel.string = "提示";
+				dialogNode.addChild(titleNode);
+				
+				//infor
+				var inforNode = new cc.Node();
+				inforNode.color = new cc.Color(0, 0, 0, 255);
+				var inforLabel = inforNode.addComponent(cc.Label);
+				inforLabel.fontSize = 30;
+				inforLabel.lineHeight = inforLabel.fontSize;
+				inforNode.y += inforLabel.lineHeight;
+				inforLabel.string = infor;
+				dialogNode.addChild(inforNode);
+				
+				//button left
+				var btnLeftNode = new cc.Node();
+				btnLeftNode.color = new cc.Color(0, 0, 0, 255);
+				
+				var btnLeft = btnLeftNode.addComponent(cc.Label);
+				btnLeft.string = "取消";
+				btnLeft.fontSize = 28;
+				btnLeft.lineHeight = btnLeft.fontSize;
+				btnLeftNode.x = -dialongWinWith/4 ;
+				btnLeftNode.y = -dialongWinHeight/4 ;
+				dialogNode.addChild(btnLeftNode);
+				
+				function cancelCallback(e){
+					console.log("cancel");
+					markNode.destroy();
+					if(cancelFun){
+						cancelFun();
+					}
+				}
+				btnLeftNode.on(cc.Node.EventType.TOUCH_END, cancelCallback, this);
+				
+				//button right 
+				var btnRightNode = new cc.Node();
+				btnRightNode.color = new cc.Color(0, 0, 0, 255);
+				var btnRight = btnRightNode.addComponent(cc.Label);
+				btnRight.string = "确定";
+				btnRight.fontSize = btnLeft.fontSize;
+				btnRight.lineHeight = btnRight.fontSize;
+				btnRightNode.x = dialongWinWith/4 ;
+				btnRightNode.y = -dialongWinHeight/4;
+				dialogNode.addChild(btnRightNode);
+				function enterCallback(e){
+					console.log("enter");
+					markNode.destroy();
+					if(enterFun){
+						enterFun();
+					}
+				}
+				btnRightNode.on(cc.Node.EventType.TOUCH_END, enterCallback, this);
+				
+				
+				markNode.addComponent(cc.BlockInputEvents);
+				markNode.addChild(dialogNode);
+				
+				if(viewNode){
+					viewNode.addChild(markNode);
+				}else{
+					var can = cc.director.getScene().getChildByName("Canvas");
+					can.addChild(markNode);
+				}
+			}
         var o = e("enums").Event_Name
           , a = ["\u4e3a\u5e08\u575a\u6301\u4e0d\u4f4f\u5566\uff01\u5feb\u6765\u6551\u6211", "\u5996\u7cbe\uff01\u5403\u4ffa\u8001\u5b59\u4e00\u68d2\uff01", "\u6709\u4e2a\u87e0\u6843\u4f1a\u8001\u5b59\u8bf7\u4f60\u53c2\u52a0\u4e00\u4e0b", "\u6211\u5728\u4f17\u4ed9\u4e2d\u6392\u884c\u7b2c\u4e00\uff0c\u5feb\u6765\u770b\u770b\u4f60\u6392\u7b2c\u51e0", "\u4e00\u4e2a\u80fd\u6253\u7684\u90fd\u6ca1\u6709\uff0c\u4e0d\u670d\u6765\u6218\uff01"]
           , r = function() {
@@ -9300,18 +9488,20 @@ window.__require = function e(t, i, n) {
                 value: function(e, t) {
 					//埋点 root video。 完整播放完回调t();否则不回调
 					//console.log("show video");
-					if(window.h5api && confirm("是否播放视频,获得相应奖励？")){
-						window.h5api.playAd(function(obj){
-							console.log('代码:' + obj.code + ',消息:' + obj.message);
-							if (obj.code === 10000) {
-								console.log('开始播放');
-							} else if (obj.code === 10001) {
-								t();
-							} else {
-								//console.log('广告异常');
-							}
-						});
-					}
+					dialogConfirm("使用激励获得相应奖励?", function(){
+						if(window.h5api){
+							window.h5api.playAd(function(obj){
+								console.log('代码:' + obj.code + ',消息:' + obj.message);
+								if (obj.code === 10000) {
+									console.log('开始播放');
+								} else if (obj.code === 10001) {
+									t();
+								} else {
+									//console.log('广告异常');
+								}
+							});
+						}
+					}, function(){});
 					
 					//修改
                   /*  var i = this
