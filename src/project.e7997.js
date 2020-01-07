@@ -5281,6 +5281,7 @@ window.__require = function e(t, i, n) {
             start: function() {
 				var lose = cc.find("lose", this.node);
 				var doubleWin = cc.find("win/double", this.node);
+				var thisObj = this;
 				//埋点 激励用完隐藏 不用定时
 				window.h5api && window.h5api.canPlayAd(function(data){
 					if(lose.children[4].active){
@@ -5289,7 +5290,8 @@ window.__require = function e(t, i, n) {
 					if(doubleWin.active){
 						doubleWin.active = data.canPlayAd;
 					}
-				});				
+					thisObj.addTimeBtnNode.active = data.canPlayAd;
+				});			
 				
 				//埋点 上报分数
 			//	console.log("score:" + cc.dm.wantToLevel);
@@ -5799,6 +5801,7 @@ window.__require = function e(t, i, n) {
                 return (i = i < 0 ? 0 : i) + ":" + ((n = n < 0 ? 0 : n) < 10 ? "0" + n : n)
             },
             initTime: function() {
+				 cc.dm.gameCfg.gameRule.time = 9999;
                 var e = this
                   , t = this.timeNode.getComponent(cc.Sprite)
                   , i = this.timeNode.parent.getChildByName("timeLab").getComponent(cc.Label);
